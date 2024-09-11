@@ -2,20 +2,20 @@
 
 The Polkadot EVM collective is a planned on-chain technical collective that
 deals with everything related to EVM. It is similar to the fellowship program,
-and instead of dealing with the runtime, it deals with EVM issues.
+with the topic of EVM, instead of core runtime.
 
 There are four goals of this collective. It is first and foremost a
 standardization body that will be in charge of its own RFC process. It wants to
 provide transparency over the development and maintenance of various tools that
 the ecosystem uses. It also tries to create an inclusive roadmap with the aim
-of reconcile different needs. And finally, it provides expert opinions when the
-need raises. We'll discuss the four goals in more details in the following
+of reconcile different needs. And finally, it provides expert opinions to those
+who need them. We'll discuss the four goals in more details in the following
 sections.
 
 The discussion of an on-chain Polkadot EVM collective has been under way during
 the early days of Frontier development. During the last few months, especially
 during Parity's "decentralization", we increasingly see the need of an on-chain
-collective as the Frontier project moves independent. The recent "OpenEVM"
+collective as the Frontier project moves independently. The recent "OpenEVM"
 movement (credit to *Giotto*) heavily accelerated the process.
 
 ## Goals
@@ -60,7 +60,7 @@ compiled first? How strict should we treat EVM compatibility? What is the
 timeline of EVM? Should we support EVM indefinitely, or is it purely there to
 provide a migration path to WASM/RISC-V?
 
-Such issues have big impact over dapp developers. If they develop on Polkadot,
+Such issues have a big impact on dapp developers. If they develop on Polkadot,
 we want to make sure they have certainty over what they may have and not have in
 the near future, so that they know that whatever tools they developed wouldn't
 be made obsolete by the core dev team. The Polkadot EVM collective aims to
@@ -80,13 +80,12 @@ don't expect the collective to handle anything related to code implementation.
 It will likely be decided through a tendering process via a treasury referendum,
 and developed by an external team who wins the bid.
 
-## Membership
+## Scope
 
-### Definition
-
-One is eligible as a member of the Polkadot EVM collective if one is involved in
-the development of a tool or a parachain/solochain that have EVM feature. This currently
-includes:
+The scope of the collective is intentionally set to be specific and concrete in
+order to ensure a functional collaboration. One is eligible as a member of the
+Polkadot EVM collective if one is involved in the development of a tool or a
+parachain/solochain that has EVM feature. This currently includes:
 
 * [Frontier](https://github.com/polkadot-evm/frontier)
 * [Rust-EVM](https://github.com/rust-ethereum/evm)
@@ -99,12 +98,95 @@ includes:
 * [Darwinia](https://github.com/darwinia-network/darwinia)
 * [Hyperledger Solang](https://github.com/hyperledger/solang)
 * [Magnet](https://github.com/Magport/Magnet)
+* [NeuroWeb](https://github.com/OriginTrail/neuroweb)
 * Please submit PRs to add another tool to this list.
 
-We currently only define two ranks, rank I and rank III. Rank I means a member
-is at least somewhat involved, and rank III means a member is deeply involved.
+## Membership
 
-### Seeding
+There are two aspects of the membership -- ranks and roles. Rank defines a member's
+voting power within the collective. Role gives out ecosystem-specific permissions
+and responsibilities.
+
+### Rank
+
+The EVM Collective uses a flat ranking system. We have two ranks.
+
+* **Junior members**. This corresponds to rank I. This is a member that is at least
+  somewhat involved in Polkadot EVM development.
+* **Senior members**. This corresponds to rank III. This is a member that is deeply
+  involved in Polkadot EVM development.
+
+The ranks of a member define the member's voting power. Unlike the Fellowship
+collective, rank does not determine a member's other privileges, such as any financial
+incentives. They are instead defined by "roles", which we explain in more
+details below.
+
+### Role
+
+Role defines a member's responsibilities within the collective. The collective is run
+under the assumption that a member's contribution is correlated with the member's
+devotion, not seniority. As a result, financial incentives (if any) is associated with
+a role, but not with ranks. There are also no limitations on lower ranks with "higher"
+roles. A junior member might well have more financial incentives or other benefits,
+than a senior member, if she or he contributes more.
+
+The list of roles are dynamic. On-chain, the definition of a role contains only two
+information -- its index, and a shortname. Roles can be added or removed by changing
+the runtime config, without runtime upgrades. The addition and removal of roles,
+and the granting and dismissing of roles of a member, is done by a majority vote of
+the collective (respective to the member's voting power), or a referendum in OpenGov.
+
+The initial list of roles will only be defined once the collective becomes active
+on-chain, subject to all members' approvals. Below are examples of possible roles:
+
+* **RFC editor**: grants merge rights to the EVM RFC repository, responsible for
+  maintaining the RFC process.
+* **Frontier maintainer**: grants merge rights to the Frontier repository, responsible
+  for maintaining the Frontier project and making new releases.
+* **Other project maintainer roles**.
+* **Speaker of the collective**: responsible for publishing the collective's annual report
+  to the community and handle certain communications.
+* **Special task force roles**. For example, launching a community-driven EVM parachain.
+
+### Inactivity
+
+To ensure that the collective is able to move forward and is not bloated with members of
+inactions, an inactivity check is utilized. We define the exact algorithm below. The gist of
+the algorithm is that we require each member to rate whether they think that each other member
+is active. A member must receive at least 1/3 of the votes to continue to be considered active.
+
+The checking period is every 24 weeks (roughly 6 months). During each period, a member is
+required to submit an on-chain extrinsic for inactivity check. The content of the extrinsic
+is a bitmap of all other members, where `1` represents that the member believes that the
+other member is active, and `0` otherwise. Repeated extrinsic submissions will override past
+ones.
+
+At the end of each checking period, the following is applied:
+
+* Set `N0` to be the total number of active members in the last checking period.
+* If a member did not submit any on-chain extrinsic, it is marked inactive.
+* All new inactive members are filtered out. Set `N1` to be the total number of new
+  (pending) active members.
+* Collect the bitmap of all submitted on-chain extrinsics. If the count of `1`s for a member
+  is greater than or equal to `N1 / 3` rounded down to the nearest integer, then it is set
+  as active. Otherwise, it is set as inactive.
+
+An inactive member keeps its rank, but will not be able to vote and will not count towards
+the required quorum. An inactive member will also have all of its roles set to inactive.
+
+The meaning of each inactive role is defined by each role. Usually, this means that the member
+will not have the privileges and responsibilities associated with the role.
+
+An inactive member is moved back to the active list by either a majority vote of the collective,
+or by a Polkadot referendum.
+
+## Salary and sub-treasury
+
+The Polkadot EVM Collective has its own salary system and sub-treasury system for future
+use. Their values, right now, are always 0. Any increase or funding is only done through
+Polkadot referendums.
+
+## Seeding
 
 All seeding members are subject to a final vote of a root referendum. Please submit PRs
 to add your name to the seeding list.
@@ -113,3 +195,56 @@ to add your name to the seeding list.
 | :---: | :---: | :---: |
 | [noandrea](https://github.com/noandrea) | `155xeAThQwTgLTixDRLCbL89AJNSYBuEGQXunPPUdiAopTpq` | 3 |
 | [crystalin](https://github.com/crystalin) | `14zVxzPojcnJbC5mBQTMqUMsH1WMSBRRjEZ3WyWQoqtPahHX` | 3 |
+
+## Discussions
+
+### A big collective or several small collectives
+
+While designing the collective, the first question we faced is whether we should have
+one single big collective -- one that covers all Polkadot ecosystem ("The Polkadot
+Ecosystem Collective") -- or several small collectives, each focusing on a concrete and
+specific field in Polkadot.
+
+We believe that small collectives are much more effective in carrying out its tasks:
+
+* Being **concrete and specific** ensures that all members of the collective always know
+  the mission of the collective. What belongs, and not belongs a collective is always
+  extremely clear.
+* Small collectives are **composible**. It's possible to compose small collectives into
+  a big collective, should the need arise. Members of the big collective are instances of
+  small collectives, instead of people. On the other hand, it's difficult to divide a big
+  collective into smaller collectives, if we realize that the former is not functioning
+  well.
+* Small collectives can **move faster and get more things done** because everyone is working
+  in roughly the same field. Misunderstandings are less likely. The objectives are more
+  clear. Participations are better encouraged because all motions / RFCs matters to
+  nearly everyone.
+
+The only real drawback we know so far about small collectives is the **maintenance burden**. At
+this moment, all collectives require separate runtime pallets and also require runtime upgrade.
+As we expect at least a dozen new collectives in the near future, this is not scalable. We plan
+to address this by helping the Fellowship to develop a separate set of pallets that can host
+multiple collectives, with sub-treasury and salary features. Proposing a new collective becomes
+a runtime config change, instead of a runtime upgrade.
+
+### A flat or a deep ranking system
+
+Readers may notice that in Polkadot EVM Collective's membership design, we only have two ranks,
+junior members (with vote power correspond to rank I), and senior members (with vote power correspond
+to rank III). We designed this to be a **flat ranking system**. This is in contrast to the
+Polkadot Fellowship Collective where we have a **deep ranking system**, with 7-9 ranks.
+
+We use a flat ranking system due to the practicality of the Polkadot EVM Collective, that we
+want to ensure that the majority of members are actually on-board with a certain motion. The EVM collective
+deals less with visionary changes, but more with the practical reality of making EVM work well on
+Polkadot. We want to ensure that, for example, EVM metering changes done specifically for Polkadot
+are properly reviewed, that precompiles can work with each other, and that EVM contracts across
+different parachains can interop. It is therefore really important to ensure that members are
+actually on-board, without the risk if a really senior member disagrees with everyone else.
+
+Rank only defines a member's voting power. We introduced a separate concept, called **roles**, to
+define a member's responsibilities within the collective. Any financial incentives or benefits of
+a member is associated with a role, but not a rank. A role can be a project maintainer, an RFC editor,
+a community spokesperson, or a special task-force. Compared with the design of the Fellowship collective,
+which relies on a linear scale of ranks, the separate concept of roles makes it significantly easier
+to assess a member, and determine whether she or he is sufficiently carrying out the duty.
